@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bargain Spaza</title>
+<style>
+/* ====== Reset & base ====== */
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: "Poppins", Arial, sans-serif; background:#fff8f6; color:#222; }
+
+/* ====== Header ====== */
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 34px;
+  background: linear-gradient(90deg, #0033cc, #6a1b9a, #ff0000, #ff8a00, #ffcc00, #00a651);
+  color:white;
+  box-shadow:0 4px 10px rgba(0,0,0,0.12);
+}
+.header-left { display:flex; align-items:center; gap:12px; }
+.header-left img.logo-circle {
+  width:52px; height:52px; border-radius:50%; object-fit:cover; border:3px solid rgba(255,255,255,0.85);
+}
+header h1 { font-size:22px; font-weight:700; letter-spacing:0.6px; color:white; }
+nav ul { list-style:none; display:flex; gap:18px; align-items:center; }
+nav li { cursor:pointer; font-weight:700; color:rgba(255,255,255,0.95); transition:transform .15s; }
+nav li:hover { transform:scale(1.02); color:#fffdd0; }
+
+/* ====== Hero ====== */
+.hero {
+  max-width:1000px; margin:36px auto; background:#fff; border-radius:12px;
+  padding:34px; text-align:center; box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+.hero h2 { color:#c8102e; font-size:28px; margin-bottom:10px; }
+.hero p { color:#333; line-height:1.5; margin-bottom:16px; }
+.hero .cta { background:#ffcc00; color:#000; padding:10px 18px; border:none; border-radius:8px; font-weight:700; cursor:pointer; }
+
+/* ====== Content: slider + article ====== */
+.content-section {
+  max-width:1200px; margin:28px auto; display:flex; gap:20px; padding:0 20px; align-items:flex-start;
+}
+/* slider (left 65%) */
+.slider {
+  flex:0 0 65%;
+  position:relative; border-radius:12px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.08);
+  background:#fff;
+  height:400px;
+}
+.slides { height:100%; position:relative; }
+.slide {
+  position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:flex-start;
+  opacity:0; transition:opacity .9s ease;
+}
+.slide img { width:150%; height:100%; object-fit:cover; display:block; }
+
+/* caption overlay */
+.caption {
+  margin:18px;
+  background:rgba(0,0,0,0.55);
+  color:#fff; padding:10px 14px; border-radius:8px; font-weight:600;
+  box-shadow:0 6px 12px rgba(0,0,0,0.18);
+}
+
+/* visible slide */
+.slide.show { opacity:1; z-index:2; }
+
+/* arrows */
+.arrow {
+  position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%;
+  background:rgba(255,204,0,0.95); border:none; cursor:pointer; box-shadow:0 6px 14px rgba(0,0,0,0.18);
+  display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700;
+}
+.arrow.left { left:12px; }
+.arrow.right { right:12px; }
+
+/* dots */
+.dots {
+  position:absolute; left:50%; transform:translateX(-50%); bottom:14px; display:flex; gap:8px;
+}
+.dot {
+  width:12px; height:12px; border-radius:50%; background:#ddd; border:2px solid rgba(255,255,255,0.9); cursor:pointer;
+}
+.dot.active { background:#c8102e; }
+
+/* article (right 35%) */
+.article {
+  flex:0 0 33%;
+  background: linear-gradient(135deg,#c8102e,#ff8a00,#ffcc00,#00a651,#0033cc);
+  color:white; padding:20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+.article h3 { margin-bottom:10px; font-size:20px; }
+.article p { line-height:1.6; font-size:14px; }
+
+/* ====== History ====== */
+.history {
+  max-width:1000px; margin:32px auto; background:#fff; padding:28px; border-radius:12px; text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.06);
+}
+.history h2 { color:#007847; margin-bottom:10px; }
+
+/* ====== Footer ====== */
+footer {
+  margin-top:28px; background: linear-gradient(90deg,#0033cc,#6a1b9a,#c8102e,#ff8a00,#ffcc00,#00a651);
+  color:white; padding:22px 34px; display:flex; gap:20px; justify-content:space-between; flex-wrap:wrap;
+}
+.footer-col { max-width:320px; }
+.footer-col h4 { margin-bottom:8px; font-size:14px; }
+.footer-col p { font-size:14px; line-height:1.45; color:#fffdf0; }
+
+/* ====== Popups ====== */
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center;
+  z-index:999;
+}
+.popup {
+  background:#fff; color:#222; width:88%; max-width:640px; padding:20px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.25);
+}
+.popup h3 { color:#c8102e; margin-bottom:8px; }
+.popup button { margin-top:14px; background:#ffcc00; border:none; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; }
+
+/* ====== Responsive ====== */
+@media (max-width:900px) {
+  .content-section { flex-direction:column; padding:0 14px; }
+  .slider, .article { flex: 1 1 100%; width:100%; }
+  .slider { height:300px; }
+  header { padding:12px 14px; }
+  header h1 { font-size:18px; }
+  .header-left img.logo-circle { width:42px; height:42px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <!-- Put your circular logo file as logo-spaza.png (replace if needed) -->
+    <img src="logo spaza.jpg" alt="Bargain Spaza logo" class="logo-circle">
+    <h1>Bargain Spaza</h1>
+  </div>
+
+  <nav>
+    <ul>
+      <li id="homeBtn">Home</li>
+      <li id="aboutBtn">About</li>
+      <li id="productsBtn">Products</li>
+      <li id="contactBtn">Contact</li>
+    </ul>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Proudly Local, Always Fresh</h2>
+  <p>Affordable food, snacks, and essentials for every Mhluzi home. Supporting local suppliers since 2025.</p>
+  <button class="cta" onclick="document.querySelector('.content-section').scrollIntoView({behavior:'smooth'})">Explore Our Shop</button>
+</section>
+
+<section class="content-section">
+  <!-- Slider (left) -->
+  <div class="slider" aria-label="Featured products slider">
+    <div class="slides">
+      <div class="slide show" data-caption="Fresh bread for the morning">
+        <img src="bread.jpg" alt="Bread">
+        <div class="caption">Fresh Bread for the Morning</div>
+      </div>
+
+      <div class="slide" data-caption="Tasty milk for every break">
+        <img src="milk.png" alt="milk">
+        <div class="caption">fresh Milk for Every Break</div>
+      </div>
+
+      <div class="slide" data-caption="Sweet sugar, locally sourced">
+        <img src="Sugar.jpg" alt="Sugar">
+        <div class="caption">Sweet sugar, Locally Sourced</div>
+      </div>
+
+      <div class="slide" data-caption="Daily poutry, everyday gut">
+        <img src="meat.jpg" alt="Poultry">
+        <div class="caption">Daily poutry, everyday gut</div>
+      </div>
+
+      <div class="slide" data-caption="Maize meal for every family">
+        <img src="maize meal.jpeg" alt="Maize Meal">
+        <div class="caption">Maize Meal for Every Family</div>
+      </div>
+    </div>
+
+    <!-- manual arrows -->
+    <button class="arrow left" aria-label="Previous slide" id="prevBtn">‹</button>
+    <button class="arrow right" aria-label="Next slide" id="nextBtn">›</button>
+
+    <!-- dots -->
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <!-- Daily Community Article (right) -->
+  <aside class="article" aria-label="Daily community article">
+    <h3>Daily Community Article</h3>
+    <p><strong>Mhluzi — Middelburg, Mpumalanga (2025)</strong></p>
+    <p>Bargain Spaza keeps Mhluzi fed. In 2025 the township's community spirit is strong — local suppliers deliver bread each morning, and young entrepreneurs sell fresh produce in the afternoons. Bargain Spaza supports black-owned suppliers and helps families with small prices and regular community events.</p>
+    <p><em>Community notice:</em> Free bread for pensioners on the last Friday of every month. Contact the shop to volunteer or donate.</p>
+    <p style="margin-top:12px; font-size:13px;"><strong>Contact:</strong> 1207 Maphosa Street, Mhluzi — +27 68 443 8823 — bargainspaza@gmail.com</p>
+  </aside>
+</section>
+
+<section class="history">
+  <h2>The History and Reason for the Shop</h2>
+  <p>Bargain Spaza started with one idea — to bring affordable, quality groceries to the people of Mhluzi. We began as a small family-run business and grew into a trusted stop for daily essentials. Our mission is to uplift our community by keeping prices low and hearts full.</p>
+</section>
+
+<footer>
+  <div class="footer-col">
+    <h4>Visit / Contact</h4>
+    <p>📍 111 Tiale Street, Middelburg, Mhluzi, 1050<br>
+       📞 +27 68 443 8823<br>
+       ✉️ bargainspaza@gmail.com</p>
+  </div>
+
+  <div class="footer-col">
+    <h4>Opening Hours</h4>
+    <p>Mon–Fri: 06:00 – 20:00<br>Sat: 07:00 – 18:00<br>Sun: 08:00 – 15:00</p>
+  </div>
+
+  <div class="footer-col">
+    <h4>Follow</h4>
+    <p>Instagram: @bargainspaza</p>
+  </div>
+
+  <div class="footer-col">
+    <h4>About</h4>
+    <p>Serving Mhluzi with pride since 2025 — Registered Local Business #SPZ1050</p>
+  </div>
+</footer>
+
+<!-- overlay + popups -->
+<div class="overlay" id="overlay"></div>
+
+<div class="popup" id="aboutPopup" aria-hidden="true">
+  <h3>About Bargain Spaza</h3>
+  <p>Bargain Spaza is a community-first spaza shop that focuses on affordable groceries, supporting black-owned local suppliers, and bringing people together. We started as a family stall and grew into a trusted shop for the township.</p>
+  <button onclick="closePopup()">Close</button>
+</div>
+
+<div class="popup" id="productsPopup" aria-hidden="true">
+  <h3>Products & FAQs</h3>
+  <p><strong>Top 10 Essentials</strong></p>
+  <ol>
+    <li>Bread</li>
+    <li>Maize Meal</li>
+    <li>Cooking Oil</li>
+    <li>Sugar</li>
+    <li>Milk</li>
+    <li>Tea & Coffee</li>
+    <li>Eggs</li>
+    <li>Soap & Washing Powder</li>
+    <li>Chips & Cooldrinks</li>
+    <li>Tinned Foods</li>
+  </ol>
+  <hr>
+  <p><strong>FAQs</strong></p>
+  <p><strong>How much is bread?</strong> — R10</p>
+  <p><strong>Do you sell airtime?</strong> — Yes: Vodacom, MTN, Telkom, Cell C</p>
+  <p><strong>Do you deliver?</strong> — Yes, within nearby Mhluzi areas (small fee)</p>
+  <button onclick="closePopup()">Close</button>
+</div>
+
+<script>
+// Slider logic (auto + manual + clickable slide -> next)
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsContainer = document.getElementById('dots');
+  let current = 0;
+  let timer = null;
+  const total = slides.length;
+
+  // build dots
+  for (let i=0;i<total;i++){
+    const d = document.createElement('button');
+    d.className = 'dot' + (i===0 ? ' active' : '');
+    d.dataset.index = i;
+    d.addEventListener('click', ()=> goTo(i));
+    dotsContainer.appendChild(d);
+  }
+
+  function show(i) {
+    slides.forEach((s, idx)=> {
+      s.classList.toggle('show', idx === i);
+    });
+    Array.from(dotsContainer.children).forEach((d, idx)=> d.classList.toggle('active', idx===i));
+  }
+
+  function goTo(i) {
+    current = (i + total) % total;
+    show(current);
+    resetTimer();
+  }
+
+  function next() {
+    goTo(current + 1);
+  }
+  function prev() {
+    goTo(current - 1);
+  }
+
+  // click slide to go next
+  slides.forEach(s => s.addEventListener('click', next));
+
+  // arrows
+  document.getElementById('prevBtn').addEventListener('click', function(e){ e.stopPropagation(); prev(); });
+  document.getElementById('nextBtn').addEventListener('click', function(e){ e.stopPropagation(); next(); });
+
+  function resetTimer(){
+    if (timer) clearInterval(timer);
+    timer = setInterval(next, 4000); // 4s
+  }
+
+  // init
+  show(0);
+  resetTimer();
+})();
+
+// Popups
+const overlay = document.getElementById('overlay');
+const aboutPopup = document.getElementById('aboutPopup');
+const productsPopup = document.getElementById('productsPopup');
+
+document.getElementById('aboutBtn').addEventListener('click', ()=> openPopup(aboutPopup));
+document.getElementById('productsBtn').addEventListener('click', ()=> openPopup(productsPopup));
+document.getElementById('homeBtn').addEventListener('click', ()=> closePopup());
+document.getElementById('contactBtn').addEventListener('click', ()=> {
+  alert("Contact Bargain Spaza at +27 68 443 8823 or bargainspaza@gmail.com");
+});
+
+function openPopup(el){
+  overlay.style.display = 'flex';
+  el.style.display = 'block';
+  overlay.classList.add('active');
+  el.classList.add('active');
+  el.setAttribute('aria-hidden','false');
+}
+function closePopup(){
+  overlay.style.display = 'none';
+  [aboutPopup, productsPopup].forEach(p=> { p.style.display = 'none'; p.classList.remove('active'); p.setAttribute('aria-hidden','true'); });
+  overlay.classList.remove('active');
+}
+
+// close by clicking outside popup
+overlay.addEventListener('click', closePopup);
+</script>
+
+</body>
+</html>
